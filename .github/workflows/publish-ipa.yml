@@ -1,0 +1,22 @@
+name: Publish existing IPA
+on:
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download verified build artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh run download 43023682073 --name AggregatorApp-unsigned --dir release
+          echo 'fe14d5be38299c45cbefb1bb7be6e345819bc395e0d154aed92f4643aa8c4693  release/AggregatorApp-unsigned.ipa' | sha256sum -c -
+      - name: Upload to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release upload v1.0.0-unsigned release/AggregatorApp-unsigned.ipa

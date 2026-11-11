@@ -1,0 +1,25 @@
+name: Build unsigned iOS IPA
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show Xcode version
+        run: xcodebuild -version
+      - name: Build unsigned IPA
+        run: bash Scripts/build_unsigned_ipa.sh
+      - name: Upload unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: AggregatorApp-unsigned
+          path: build/ipa/AggregatorApp-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 14

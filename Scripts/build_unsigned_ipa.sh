@@ -33,7 +33,7 @@ if [[ -n "$(find "$APP_PATH" \( -name _CodeSignature -o -name embedded.mobilepro
   echo 'Archive contains a code signature or provisioning profile.' >&2
   exit 1
 fi
-lipo -verify_arch arm64 "$APP_PATH/AggregatorApp"
+lipo "$APP_PATH/AggregatorApp" -verify_arch arm64
 /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP_PATH/Info.plist"
 
 mkdir -p "$IPA_DIR/Payload"

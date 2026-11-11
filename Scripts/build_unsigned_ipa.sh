@@ -36,6 +36,27 @@ fi
 lipo "$APP_PATH/AggregatorApp" -verify_arch arm64
 /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP_PATH/Info.plist"
 
+# A launch screen declaration opts the app into the device's full screen size.
+if ! /usr/libexec/PlistBuddy -c 'Print :UILaunchScreen' "$APP_PATH/Info.plist" >/dev/null 2>&1; then
+  echo 'Archive is missing the UILaunchScreen declaration.' >&2
+  exit 1
+fi
+if [[ ! -f "$APP_PATH/Assets.car" ]]; then
+  echo 'Archive is missing the compiled asset catalog.' >&2
+  exit 1
+fi
+ICON_NAME=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIcons:CFBundlePrimaryIcon:CFBundleIconName' "$APP_PATH/Info.plist")
+if [[ "$ICON_NAME" != 'AppIcon' ]]; then
+  echo "Unexpected primary app icon: $ICON_NAME" >&2
+  exit 1
+fi
+ASSET_INFO="$BUILD_DIR/asset-info.json"
+assetutil --info "$APP_PATH/Assets.car" > "$ASSET_INFO"
+if ! grep -q 'AppIcon' "$ASSET_INFO"; then
+  echo 'Compiled asset catalog does not contain AppIcon.' >&2
+  exit 1
+fi
+
 mkdir -p "$IPA_DIR/Payload"
 cp -R "$APP_PATH" "$IPA_DIR/Payload/"
 (cd "$IPA_DIR" && zip -qry "$(basename "$IPA_PATH")" Payload)

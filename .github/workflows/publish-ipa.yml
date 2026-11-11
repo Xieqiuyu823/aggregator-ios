@@ -19,4 +19,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: gh release upload v1.0.0-unsigned release/AggregatorApp-unsigned.ipa
+        run: |
+          gh release create v1.0.0-unsigned release/AggregatorApp-unsigned.ipa \
+            --target af3fdacf7044b45418191b560630fe54715beb35 \
+            --title 'Aggregator iOS 1.0.0（未签名）' \
+            --notes '未签名 IPA，需要使用有效证书重新签名后安装。使用前请按 README 配置 GitHub Actions。'

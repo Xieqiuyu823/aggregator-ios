@@ -1,0 +1,17 @@
+name: Publish IPA
+on: workflow_dispatch
+permissions:
+  actions: read
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish verified build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh run download 43024801376 --name AggregatorApp-unsigned --dir release
+          echo 'f59d58c58e9e85a8b695aa28f449925847869217a06d5b95302d46cf39250dba  release/AggregatorApp-unsigned.ipa' | sha256sum -c -
+          gh release create v1.0.1-unsigned release/AggregatorApp-unsigned.ipa --target a593af00dc2ff8da644a683c99c349783d12e92d --title 'Aggregator iOS 1.0.1（未签名）' --notes '增加应用图标与全屏适配。IPA 未签名，安装前需重新签名。'
